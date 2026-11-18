@@ -44,6 +44,15 @@ proxy, ensure you have a `http://` or `https://` in your `TARGET_ADDR`.
 
 _CLI arguments will take precedence over environment variables._
 
+### Running as nonroot, and a state volume
+
+The image runs as distroless's `nonroot` user (uid 65532). Its default state dir, `/tmp/railtail`,
+is writable by that user, but it is lost on every redeploy, and a node that loses its state joins
+again as a new device. To keep the node's identity, mount a volume and point `TS_STATEDIR_PATH` at
+it. Railway mounts volumes owned by root, so a service with a volume also needs
+`RAILWAY_RUN_UID=0`; without it tailscaled cannot write its state, the node never joins, and the
+deploy still reports success because the process stays up.
+
 ## About
 
 This was created to work around userspace networking restrictions. Dialing a
